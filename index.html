@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>函数导数消消乐 - 关卡模式</title>
     <style>
+        /* 加载指示器 */
+        .loading-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 9999;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+
+        .loading-indicator.loaded {
+            transform: scaleX(1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -46,6 +64,8 @@
             background: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
             animation: float 15s infinite ease-in-out;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         @keyframes float {
@@ -102,12 +122,14 @@
             position: relative;
             z-index: 1;
             animation: slideIn 0.5s ease-out;
+            will-change: transform;
+            contain: layout style paint;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -171,6 +193,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 20px;
+            transform: translateZ(0);
         }
 
         .cell {
@@ -194,6 +217,9 @@
             animation: cardAppear 0.5s ease-out backwards;
             transform-style: preserve-3d;
             perspective: 1000px;
+            will-change: transform;
+            contain: layout style paint;
+            transform: translateZ(0);
         }
 
         @keyframes cardAppear {
@@ -1402,6 +1428,9 @@
     </style>
 </head>
 <body>
+    <!-- 加载指示器 -->
+    <div class="loading-indicator" id="loadingIndicator"></div>
+    
     <!-- 动态背景粒子 -->
     <div class="particles" id="particles"></div>
 
@@ -1487,6 +1516,21 @@
     </div>
 
     <script>
+        // 页面加载完成状态
+        let isPageLoaded = false;
+        
+        // 显示加载进度
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('loadingIndicator');
+            if (loader) {
+                loader.classList.add('loaded');
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+            isPageLoaded = true;
+        });
+
         // 关卡数据
         const LEVELS = [
             {
@@ -1686,18 +1730,27 @@
             return completedLevels.includes(levelId);
         }
 
-        // 创建背景粒子
+        // 创建背景粒子 - 优化版本
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
-                particlesContainer.appendChild(particle);
+            const particleCount = 15; // 减少粒子数量
+            
+            function createParticleBatch() {
+                for (let i = 0; i < particleCount; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.top = Math.random() * 100 + '%';
+                        particle.style.animationDelay = Math.random() * 15 + 's';
+                        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                        particlesContainer.appendChild(particle);
+                    }, i * 50); // 分批创建
+                }
             }
+            
+            // 延迟创建粒子
+            setTimeout(createParticleBatch, 1000);
         }
 
         // 创建爆炸粒子效果
@@ -2221,33 +2274,43 @@
         }
 
         // 绑定按钮事件
-        document.getElementById('continueBtn').addEventListener('click', () => {
-            hideActionButtons();
-            selectedCells.forEach(c => c.element.classList.remove('selected'));
-            selectedCells = [];
-            showMessage('请继续作答，先选择原函数，再选择导函数', 'info');
-        });
-        
-        document.getElementById('retryRoundBtn').addEventListener('click', () => {
-            hideActionButtons();
-            selectedCells.forEach(c => c.element.classList.remove('selected'));
-            selectedCells = [];
-            sameTypeMistakeCount = 0;
-            const levelKey = 'level' + currentLevel;
-            if (usedFunctions[levelKey]) {
-                usedFunctions[levelKey] = [];
-            }
-            showMessage('请重新作答', 'info');
-            startRound();
-        });
+        function bindEvents() {
+            document.getElementById('continueBtn').addEventListener('click', () => {
+                hideActionButtons();
+                selectedCells.forEach(c => c.element.classList.remove('selected'));
+                selectedCells = [];
+                showMessage('请继续作答，先选择原函数，再选择导函数', 'info');
+            });
+            
+            document.getElementById('retryRoundBtn').addEventListener('click', () => {
+                hideActionButtons();
+                selectedCells.forEach(c => c.element.classList.remove('selected'));
+                selectedCells = [];
+                sameTypeMistakeCount = 0;
+                const levelKey = 'level' + currentLevel;
+                if (usedFunctions[levelKey]) {
+                    usedFunctions[levelKey] = [];
+                }
+                showMessage('请重新作答', 'info');
+                startRound();
+            });
 
-        document.getElementById('backToLevelBtn').addEventListener('click', backToLevelSelect);
-        
-        // 绑定游戏中的返回按钮
-        document.getElementById('gameBackToLevelBtn').addEventListener('click', backToLevelSelect);
+            document.getElementById('backToLevelBtn').addEventListener('click', backToLevelSelect);
+            
+            // 绑定游戏中的返回按钮
+            document.getElementById('gameBackToLevelBtn').addEventListener('click', backToLevelSelect);
 
-        // 开始界面
-        document.getElementById('startButton').addEventListener('click', () => {
+            // 开始界面
+            document.getElementById('startButton').addEventListener('click', handleStart);
+
+            document.getElementById('backToStartBtn').addEventListener('click', () => {
+                document.getElementById('levelSelectScreen').classList.add('hidden');
+                document.getElementById('startScreen').style.display = 'flex';
+                document.getElementById('startScreen').classList.remove('hidden');
+            });
+        }
+
+        function handleStart() {
             const startScreen = document.getElementById('startScreen');
             startScreen.classList.add('hidden');
             setTimeout(() => {
@@ -2256,16 +2319,15 @@
                 createParticles();
                 renderLevelSelect();
             }, 500);
-        });
-
-        document.getElementById('backToStartBtn').addEventListener('click', () => {
-            document.getElementById('levelSelectScreen').classList.add('hidden');
-            document.getElementById('startScreen').style.display = 'flex';
-            document.getElementById('startScreen').classList.remove('hidden');
-        });
+        }
 
         // 初始化粒子
-        createParticles();
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                bindEvents();
+                createParticles();
+            }, 100);
+        });
     </script>
 </body>
 </html>
