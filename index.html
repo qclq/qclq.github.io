@@ -221,6 +221,16 @@
             contain: layout style paint;
             transform: translateZ(0);
         }
+        
+        /* 原函数单元格样式 - 蓝色底色 */
+        .cell[data-type='func'] {
+            background: linear-gradient(135deg, #1e90ff 0%, #00bfff 100%);
+        }
+        
+        /* 导数单元格样式 - 红色底色 */
+        .cell[data-type='derivative'] {
+            background: linear-gradient(135deg, #ff6347 0%, #ff4500 100%);
+        }
 
         @keyframes cardAppear {
             from {
@@ -1640,34 +1650,8 @@
             },
             {
                 id: 4,
-                name: '隐函数求导',
-                description: '掌握隐函数的求导法则',
-                pairs: [
-                    { func: 'y<sup>2</sup>=x', derivative: 'y\'=<span class="fraction"><span class="numerator">1</span><span class="denominator">2y</span></span>' },
-                    { func: 'y<sup>2</sup>=2x', derivative: 'y\'=<span class="fraction"><span class="numerator">1</span><span class="denominator">y</span></span>' },
-                    { func: 'y<sup>3</sup>=x', derivative: 'y\'=<span class="fraction"><span class="numerator">1</span><span class="denominator">3y<sup>2</sup></span></span>' },
-                    { func: 'y<sup>3</sup>=2x', derivative: 'y\'=<span class="fraction"><span class="numerator">2</span><span class="denominator">3y<sup>2</sup></span></span>' },
-                    { func: 'x<sup>2</sup>+y<sup>2</sup>=1', derivative: 'y\'=-<span class="fraction"><span class="numerator">x</span><span class="denominator">y</span></span>' },
-                    { func: 'x<sup>2</sup>+y<sup>2</sup>=4', derivative: 'y\'=-<span class="fraction"><span class="numerator">x</span><span class="denominator">y</span></span>' },
-                    { func: 'x<sup>2</sup>+y<sup>2</sup>=9', derivative: 'y\'=-<span class="fraction"><span class="numerator">x</span><span class="denominator">y</span></span>' },
-                    { func: 'e<sup>y</sup>=x', derivative: 'y\'=<span class="fraction"><span class="numerator">1</span><span class="denominator">e<sup>y</sup></span></span>' },
-                    { func: 'e<sup>y</sup>=2x', derivative: 'y\'=<span class="fraction"><span class="numerator">2</span><span class="denominator">e<sup>y</sup></span></span>' },
-                    { func: 'lny=x', derivative: 'y\'=e<sup>x</sup>' },
-                    { func: 'lny=2x', derivative: 'y\'=2e<sup>2x</sup>' },
-                    { func: 'x·y=1', derivative: 'y\'=-<span class="fraction"><span class="numerator">y</span><span class="denominator">x</span></span>' },
-                    { func: 'x·y=2', derivative: 'y\'=-<span class="fraction"><span class="numerator">y</span><span class="denominator">x</span></span>' },
-                    { func: 'x·y=3', derivative: 'y\'=-<span class="fraction"><span class="numerator">y</span><span class="denominator">x</span></span>' },
-                    { func: 'y·sinx=x', derivative: 'y\'=<span class="fraction"><span class="numerator">1-y·cosx</span><span class="denominator">sinx</span></span>' },
-                    { func: 'y·sinx=2x', derivative: 'y\'=<span class="fraction"><span class="numerator">2-y·cosx</span><span class="denominator">sinx</span></span>' },
-                    { func: 'y<sup>2</sup>+x<sup>2</sup>=xy', derivative: 'y\'=<span class="fraction"><span class="numerator">y-2x</span><span class="denominator">2y-x</span></span>' },
-                    { func: 'y<sup>2</sup>+x<sup>2</sup>=2xy', derivative: 'y\'=1' },
-                    { func: 'y<sup>2</sup>+x<sup>2</sup>=3xy', derivative: 'y\'=<span class="fraction"><span class="numerator">3y-2x</span><span class="denominator">2y-3x</span></span>' }
-                ]
-            },
-            {
-                id: 5,
                 name: '综合挑战',
-                description: '前面四关的综合练习',
+                description: '前面三关的综合练习',
                 pairs: [] // 将在运行时动态生成
             }
         ];
@@ -1915,19 +1899,17 @@
         function getLevelPairs() {
             const level = LEVELS.find(l => l.id === currentLevel);
             
-            // 第五关：混合前面四关的内容
-            if (currentLevel === 5) {
+            // 第四关：混合前面三关的内容
+            if (currentLevel === 4) {
                 const allPairs = [];
-                // 20% 基本初等函数 (2对，8*0.2=1.6，向上取整为2)
-                const level1Pairs = [...LEVELS[0].pairs].sort(() => Math.random() - 0.5).slice(0, 2);
-                // 20% 四则运算 (2对)
-                const level2Pairs = [...LEVELS[1].pairs].sort(() => Math.random() - 0.5).slice(0, 2);
-                // 30% 复合函数 (2对，8*0.3=2.4，向下取整为2，但为了凑够8对，取3对)
+                // 30% 基本初等函数 (3对)
+                const level1Pairs = [...LEVELS[0].pairs].sort(() => Math.random() - 0.5).slice(0, 3);
+                // 30% 四则运算 (3对)
+                const level2Pairs = [...LEVELS[1].pairs].sort(() => Math.random() - 0.5).slice(0, 3);
+                // 40% 复合函数 (2对)
                 const level3Pairs = [...LEVELS[2].pairs].sort(() => Math.random() - 0.5).slice(0, 2);
-                // 30% 隐函数 (2对)
-                const level4Pairs = [...LEVELS[3].pairs].sort(() => Math.random() - 0.5).slice(0, 2);
                 
-                allPairs.push(...level1Pairs, ...level2Pairs, ...level3Pairs, ...level4Pairs);
+                allPairs.push(...level1Pairs, ...level2Pairs, ...level3Pairs);
                 return allPairs;
             }
             
@@ -1969,15 +1951,21 @@
                 }
             });
 
-            // 创建包含函数和导数的数组
-            let cells = [];
+            // 创建函数和导数的数组，但分开存储
+            let funcCells = [];
+            let derivativeCells = [];
+            
             currentPairs.forEach(pair => {
-                cells.push({ text: pair.func, html: pair.func, type: 'func', pairId: pair.func });
-                cells.push({ text: pair.derivative, html: pair.derivative, type: 'derivative', pairId: pair.func });
+                funcCells.push({ text: pair.func, html: pair.func, type: 'func', pairId: pair.func });
+                derivativeCells.push({ text: pair.derivative, html: pair.derivative, type: 'derivative', pairId: pair.func });
             });
 
-            // 打乱顺序
-            cells = cells.sort(() => Math.random() - 0.5);
+            // 分别打乱函数和导数的顺序
+            funcCells = funcCells.sort(() => Math.random() - 0.5);
+            derivativeCells = derivativeCells.sort(() => Math.random() - 0.5);
+            
+            // 合并数组：函数在上，导数在下
+            const cells = [...funcCells, ...derivativeCells];
 
             // 更新UI
             renderGrid(cells);
@@ -1995,6 +1983,17 @@
         function renderGrid(cells) {
             const grid = document.getElementById('gameGrid');
             grid.innerHTML = '';
+            
+            // 添加原函数标题
+            const funcTitle = document.createElement('div');
+            funcTitle.style.gridColumn = 'span 4';
+            funcTitle.style.textAlign = 'center';
+            funcTitle.style.fontWeight = 'bold';
+            funcTitle.style.marginBottom = '10px';
+            funcTitle.style.color = '#1e90ff';
+            funcTitle.style.fontSize = '18px';
+            funcTitle.textContent = '原函数';
+            grid.appendChild(funcTitle);
 
             cells.forEach((cell, index) => {
                 const cellElement = document.createElement('div');
@@ -2006,6 +2005,19 @@
                 cellElement.style.animationDelay = (index * 0.05) + 's';
                 cellElement.addEventListener('click', () => handleCellClick(cellElement, cell));
                 grid.appendChild(cellElement);
+                
+                // 在第8个单元格后添加导数标题
+                if (index === 7) {
+                    const derivativeTitle = document.createElement('div');
+                    derivativeTitle.style.gridColumn = 'span 4';
+                    derivativeTitle.style.textAlign = 'center';
+                    derivativeTitle.style.fontWeight = 'bold';
+                    derivativeTitle.style.margin = '10px 0';
+                    derivativeTitle.style.color = '#ff6347';
+                    derivativeTitle.style.fontSize = '18px';
+                    derivativeTitle.textContent = '导数';
+                    grid.appendChild(derivativeTitle);
+                }
             });
         }
 
@@ -2143,7 +2155,7 @@
                     <h2>🎉 关卡完成！</h2>
                     <p>恭喜你完成了关卡 ${currentLevel}！</p>
                     <p>得分：${formatScore(score)} 分</p>
-                    <p>${getScoreFeedback(score)}</p>
+
                     <p>用时：${formatTime(elapsedTime)}</p>
                     <button class="button" id="backToLevelBtn2" style="margin-top: 20px;">&lt; 返回</button>
                 </div>
@@ -2168,18 +2180,7 @@
             return (Math.round(value) === value) ? String(value) : value.toFixed(1);
         }
 
-        function getScoreFeedback(value) {
-            if (value === 100) {
-                return '满分诶 恭喜你获得"导数运算达人"称号！！！';
-            }
-            if (value >= 80) {
-                return '接近完美了 加油！！！';
-            }
-            if (value >= 50) {
-                return '已经很厉害了 再加把劲！！！';
-            }
-            return '还需要再努力哦';
-        }
+
 
         function updateScore() {
             const scoreElement = document.getElementById('score');
@@ -2243,7 +2244,7 @@
                 <div class="game-failed" style="grid-column: 1 / -1;">
                     <h2>😢 对不起，您失败了</h2>
                     <p>当前得分：${formatScore(score)} 分</p>
-                    <p>${getScoreFeedback(score)}</p>
+
                     <p>总用时：${formatTime(elapsedTime)}</p>
                     <button class="button" id="retryBtn" style="margin-top: 20px;">重新挑战</button>
                 </div>
