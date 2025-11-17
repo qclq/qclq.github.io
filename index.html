@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>函数导数消消乐 - 关卡模式</title>
+    <title>函数导数消消乐 - 奖励页面</title>
     <style>
         /* 加载指示器 */
         .loading-indicator {
@@ -927,6 +927,129 @@
             background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
         }
 
+        /* 奖励页面样式 */
+        .reward-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 4000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .reward-screen.hidden {
+            display: none;
+        }
+
+        .reward-container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .reward-title {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 30px;
+            animation: celebrate 2s ease-in-out infinite;
+        }
+
+        .reward-subtitle {
+            font-size: 24px;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .reward-emoji {
+            font-size: 60px;
+            margin: 30px 0;
+            animation: emojiFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-10px) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-5px) rotate(5deg);
+            }
+        }
+
+        .reward-message {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .reward-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .reward-stat {
+            text-align: center;
+        }
+
+        .reward-stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .reward-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .reward-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .reward-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .reward-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .reward-button.share {
+            background: linear-gradient(135deg, #42e695 0%, #3bb2b8 100%);
+        }
+
         /* 响应式设计 - 移动端适配 */
         @media screen and (max-width: 768px) {
             /* 防止文本选择，优化触摸体验 */
@@ -934,7 +1057,8 @@
             .button,
             .action-button,
             .level-card,
-            .start-button {
+            .start-button,
+            .reward-button {
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
@@ -956,7 +1080,8 @@
             .action-button:hover,
             .start-button:hover,
             .back-button button:hover,
-            .game-back-button button:hover {
+            .game-back-button button:hover,
+            .reward-button:hover {
                 transform: none;
             }
 
@@ -964,7 +1089,8 @@
             .action-button:active,
             .start-button:active,
             .back-button button:active,
-            .game-back-button button:active {
+            .game-back-button button:active,
+            .reward-button:active {
                 transform: scale(0.95);
             }
 
@@ -1227,6 +1353,47 @@
                 padding: 10px 25px;
                 font-size: 14px;
             }
+
+            /* 奖励页面响应式 */
+            .reward-container {
+                padding: 30px 20px;
+            }
+
+            .reward-title {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .reward-subtitle {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .reward-emoji {
+                font-size: 48px;
+                margin: 20px 0;
+            }
+
+            .reward-message {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+
+            .reward-stats {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .reward-actions {
+                flex-direction: column;
+            }
+
+            .reward-button {
+                width: 100%;
+                max-width: none;
+            }
         }
 
         @media screen and (max-width: 480px) {
@@ -1381,6 +1548,27 @@
             .combo-indicator {
                 font-size: 28px;
             }
+
+            /* 奖励页面响应式 */
+            .reward-container {
+                padding: 25px 15px;
+            }
+
+            .reward-title {
+                font-size: 24px;
+            }
+
+            .reward-subtitle {
+                font-size: 18px;
+            }
+
+            .reward-emoji {
+                font-size: 40px;
+            }
+
+            .reward-message {
+                font-size: 14px;
+            }
         }
 
         /* 横屏模式优化 */
@@ -1434,6 +1622,12 @@
                 padding: 10px 30px;
                 font-size: 18px;
             }
+
+            /* 奖励页面横屏优化 */
+            .reward-container {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
@@ -1460,6 +1654,36 @@
             <div class="level-grid" id="levelGrid"></div>
             <div class="back-button">
                 <button id="backToStartBtn">返回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 奖励页面 -->
+    <div class="reward-screen hidden" id="rewardScreen">
+        <div class="reward-container">
+            <h1 class="reward-title">🎉 恭喜您！获得导数运算达人称号 🎉</h1>
+            <div class="reward-emoji">🏆🥇🎓🧠📚✨</div>
+            <p class="reward-subtitle">您已成功通关所有关卡！</p>
+            <p class="reward-message">您的数学才能令人惊叹！通过不懈努力，您已掌握了函数求导的核心技巧，成为了真正的导数运算达人！</p>
+            
+            <div class="reward-stats">
+                <div class="reward-stat">
+                    <div class="reward-stat-label">通关关卡</div>
+                    <div class="reward-stat-value" id="rewardLevels">4/4</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="reward-stat-label">总得分</div>
+                    <div class="reward-stat-value" id="rewardScore">0</div>
+                </div>
+                <div class="reward-stat">
+                    <div class="reward-stat-label">总用时</div>
+                    <div class="reward-stat-value" id="rewardTime">00:00</div>
+                </div>
+            </div>
+            
+            <div class="reward-actions">
+                <button class="reward-button share" id="shareButton">分享成就</button>
+                <button class="reward-button" id="rewardBackButton">返回关卡</button>
             </div>
         </div>
     </div>
@@ -1674,10 +1898,14 @@
         let elapsedTime = 0;
         let timerRunning = false;
         let usedFunctions = {};
-
+        
         // 关卡进度管理（使用内存变量，不保存到localStorage，刷新后重置）
         let unlockedLevels = [1]; // 当前会话中解锁的关卡，初始只有第一关
         let completedLevels = []; // 当前会话中完成的关卡
+        
+        // 新增：存储各关卡的得分和用时
+        let levelScores = [0, 0, 0, 0];
+        let levelTimes = [0, 0, 0, 0];
 
         function getUnlockedLevels() {
             return unlockedLevels;
@@ -1703,10 +1931,22 @@
             // 在当前会话中标记关卡为已完成（不保存到localStorage）
             if (!completedLevels.includes(levelId)) {
                 completedLevels.push(levelId);
+                
+                // 存储当前关卡的得分和用时
+                levelScores[levelId - 1] = score;
+                levelTimes[levelId - 1] = elapsedTime;
             }
             // 解锁下一关
             if (levelId < LEVELS.length) {
                 unlockLevel(levelId + 1);
+            }
+            
+            // 检查是否所有关卡都已完成
+            if (completedLevels.length === LEVELS.length) {
+                // 显示奖励页面
+                setTimeout(() => {
+                    showRewardPage();
+                }, 2000);
             }
         }
 
@@ -2169,6 +2409,22 @@
             });
         }
 
+        // 显示奖励页面
+        function showRewardPage() {
+            // 计算总得分和总用时
+            const totalScore = levelScores.reduce((sum, score) => sum + score, 0);
+            const totalTime = levelTimes.reduce((sum, time) => sum + time, 0);
+            
+            // 更新奖励页面的统计信息
+            document.getElementById('rewardLevels').textContent = `${completedLevels.length}/${LEVELS.length}`;
+            document.getElementById('rewardScore').textContent = formatScore(totalScore);
+            document.getElementById('rewardTime').textContent = formatTime(totalTime);
+            
+            // 显示奖励页面
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('rewardScreen').classList.remove('hidden');
+        }
+
         // 更新剩余配对
         function updateRemaining() {
             const remaining = 8 - matchedPairs;
@@ -2179,8 +2435,6 @@
         function formatScore(value) {
             return (Math.round(value) === value) ? String(value) : value.toFixed(1);
         }
-
-
 
         function updateScore() {
             const scoreElement = document.getElementById('score');
@@ -2308,6 +2562,18 @@
                 document.getElementById('levelSelectScreen').classList.add('hidden');
                 document.getElementById('startScreen').style.display = 'flex';
                 document.getElementById('startScreen').classList.remove('hidden');
+            });
+
+            // 奖励页面按钮
+            document.getElementById('rewardBackButton').addEventListener('click', () => {
+                document.getElementById('rewardScreen').classList.add('hidden');
+                document.getElementById('levelSelectScreen').classList.remove('hidden');
+                renderLevelSelect();
+            });
+
+            document.getElementById('shareButton').addEventListener('click', () => {
+                // 模拟分享功能
+                alert('分享功能已触发！您可以通过复制链接与朋友分享您的成就！');
             });
         }
 
